@@ -1,7 +1,7 @@
 const CACHE_NAME = 'the-fitness-v1';
 const ASSETS = [
   './',
-  './the-fitness.html',
+  './index.html',
   './fitness-manifest.json',
   './fitness-icon-192.png',
   './fitness-icon-512.png'

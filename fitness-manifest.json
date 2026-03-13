@@ -2,7 +2,7 @@
   "name": "The Fitness",
   "short_name": "Fitness",
   "description": "Daily health & fitness tracker",
-  "start_url": "./",
+  "start_url": "./index.html",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#f2f3f5",
