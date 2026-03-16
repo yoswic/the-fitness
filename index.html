@@ -1330,45 +1330,40 @@ function repairJSON(raw) {
 }
 
 const FREE_MODELS = [
-  'openrouter/auto',
-  'openrouter/free',
-  'meta-llama/llama-3.3-70b-instruct:free',
-  'meta-llama/llama-3.1-8b-instruct:free',
-  'meta-llama/llama-3.2-3b-instruct:free',
-  'meta-llama/llama-3.2-1b-instruct:free',
-  'mistralai/mistral-7b-instruct:free',
+  'arcee-ai/trinity-large-preview:free',
+  'arcee-ai/trinity-mini:free',
+  'nvidia/nemotron-3-super-120b-a12b:free',
+  'nvidia/nemotron-3-nano-30b-a3b:free',
   'mistralai/mistral-small-3.1-24b-instruct:free',
-  'mistralai/mistral-nemo:free',
-  'qwen/qwen3-8b:free',
-  'qwen/qwen3-14b:free',
-  'qwen/qwen2.5-7b-instruct:free',
-  'deepseek/deepseek-r1-0528-qwen3-8b:free',
-  'deepseek/deepseek-chat-v3-0324:free',
-  'microsoft/phi-4-reasoning-plus:free',
-  'microsoft/phi-3-mini-128k-instruct:free',
-  'nvidia/llama-3.1-nemotron-nano-8b-v1:free',
-  'tngtech/deepseek-r1t-chimera:free'
+  'z-ai/glm-4.5-air:free',
+  'liquid/lfm-2.5-1.2b-instruct:free',
 ];
 
-async function callAI(prompt, max=600) {
-  const key=(getApiKey()||'').trim();
-  if(!key)throw new Error('OpenRouter API key not set — go to Settings!');
-  let lastErr='';
-  for(let m=0;m<FREE_MODELS.length;m++){
-    try{
-      const r=await fetch('https://openrouter.ai/api/v1/chat/completions',{
-        method:'POST',
-        headers:{'Content-Type':'application/json','Authorization':'Bearer '+key,'X-Title':'The Fitness'},
-        body:JSON.stringify({model:FREE_MODELS[m],max_tokens:max,messages:[{role:'user',content:prompt}]})
-      });
-      const data=await r.json();
-      if(data.error){lastErr=data.error?.message||JSON.stringify(data.error);continue;}
-      const text=data.choices?.[0]?.message?.content;
-      if(text&&text.trim())return text;
-      lastErr='Empty response';
-    }catch(e){lastErr=e.message||'Network error';}
+async function tryModel(model, prompt, max, key) {
+  const r = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json','Authorization':'Bearer '+key,'X-Title':'The Fitness'},
+    body: JSON.stringify({model, max_tokens: max, messages: [{role:'user', content: prompt}]})
+  });
+  const data = await r.json();
+  if (data.error) throw new Error(data.error?.message || 'Model error');
+  const text = data.choices?.[0]?.message?.content;
+  if (!text || !text.trim()) throw new Error('Empty response');
+  return text;
+}
+
+async function callAI(prompt, max=512) {
+  const key = (getApiKey()||'').trim();
+  if (!key) throw new Error('OpenRouter API key not set — go to Settings!');
+  // Race top 3 models simultaneously, take first winner
+  for (let i = 0; i < FREE_MODELS.length; i += 3) {
+    const batch = FREE_MODELS.slice(i, i + 3);
+    try {
+      const result = await Promise.any(batch.map(m => tryModel(m, prompt, max, key)));
+      if (result) return result;
+    } catch(e) { /* all 3 failed, try next batch */ }
   }
-  throw new Error('Try again in a moment.');
+  throw new Error('AI tidak tersedia saat ini, coba lagi.');
 }
 
 // ── RENDER ──
@@ -1778,7 +1773,7 @@ async function doAIFood(){
   btn.disabled=true;btn.textContent='Analyzing...';
   res.innerHTML=`<div class="ai-box"><div class="ai-loading"><div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div> Analyzing food...</div></div>`;
   try{
-    const raw=await callAI(`You are a nutritionist AI. Parse the meal and return ONLY raw JSON, no markdown.\nMeal: "${text}"\nRules: If quantity mentioned multiply values. Each distinct food = one item. Realistic values based on USDA/standard nutrition databases.\nJSON: {"items":[{"name":"Food name","kal":150,"pro":10,"kar":20,"fat":5,"ico":"emoji","satFat":2,"sugar":5,"sodium":80,"chol":30,"vitA":50,"vitD":1,"vitC":5,"ca":40,"fe":1.2,"potassium":200}],"note":"one tip"}\nUnits: kal/pro/kar/fat/satFat/sugar in g, sodium/chol/ca/fe/potassium in mg, vitA in mcg, vitD in mcg, vitC in mg. Estimate as accurately as possible.`,1400);
+    const raw=await callAI(`You are a nutritionist AI. Parse the meal and return ONLY raw JSON, no markdown.\nMeal: "${text}"\nRules: If quantity mentioned multiply values. Each distinct food = one item. Realistic values based on USDA/standard nutrition databases.\nJSON: {"items":[{"name":"Food name","kal":150,"pro":10,"kar":20,"fat":5,"ico":"emoji","satFat":2,"sugar":5,"sodium":80,"chol":30,"vitA":50,"vitD":1,"vitC":5,"ca":40,"fe":1.2,"potassium":200}],"note":"one tip"}\nUnits: kal/pro/kar/fat/satFat/sugar in g, sodium/chol/ca/fe/potassium in mg, vitA in mcg, vitD in mcg, vitC in mg. Estimate as accurately as possible.`,512);
     const parsed=JSON.parse(repairJSON(raw));
     let items=parsed.items||parsed.foods||[];
     res.innerHTML=`<div class="ai-box">${items.map(x=>`<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid rgba(0,0,0,0.05)"><span style="flex:1;font-size:12px;color:var(--t1)">${x.name}</span><span style="font-weight:600;color:var(--accent)">${x.kal} cal</span></div>`).join('')}${parsed.note?`<p style="font-size:11px;color:var(--t2);margin-top:8px">${parsed.note}</p>`:''}</div><button class="btn" style="margin-top:10px" onclick='confirmAIFood(${JSON.stringify(items)})'>+ Add ${items.length} item${items.length!==1?'s':''} to Log</button>`;
@@ -1912,7 +1907,7 @@ async function doCheckProduct(){
   btn.disabled=true;btn.textContent='Analyzing...';res.style.display='block';
   body.innerHTML=`<div class="ai-loading"><div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div> Analyzing...</div>`;
   try{
-    const text=await callAI(`Nutritionist. ${cfg().weight}kg, target ${cfg().targetKal} kcal. Today: ${fi} in, ${fo} burned, ${left} left. Product "${name}" (${sj}x): ${tKal} kcal, sugar ${tGula}g, sodium ${tSod}mg, protein ${tPro}g. 3-4 sentences. Start [OK], [OK BUT...], or [AVOID].`,800);
+    const text=await callAI(`Nutritionist. ${cfg().weight}kg, target ${cfg().targetKal} kcal. Today: ${fi} in, ${fo} burned, ${left} left. Product "${name}" (${sj}x): ${tKal} kcal, sugar ${tGula}g, sodium ${tSod}mg, protein ${tPro}g. 3-4 sentences. Start [OK], [OK BUT...], or [AVOID].`,512);
     let vc='warn',vi='',vt='OK with caution';
     if(text.match(/\[AVOID\]/)){vc='no';vi='';vt='Avoid this';}
     else if(text.match(/\[OK\](?!\s*BUT)/)){vc='ok';vi='';vt='Good to go';}
@@ -1953,7 +1948,7 @@ async function doSmartLog(){
   btn.textContent='...';btn.disabled=true;
   res.innerHTML=`<div style="background:rgba(255,255,255,0.65);border:1px solid rgba(217,119,6,0.12);border-radius:16px;padding:13px 14px;margin:0 14px 12px;backdrop-filter:blur(16px)"><div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--t2)"><div class=ai-dot></div><div class=ai-dot style=animation-delay:.2s></div><div class=ai-dot style=animation-delay:.4s></div><span style=margin-left:4px>Parsing your log...</span></div></div>`;
   try{
-    const raw=await callAI('Fitness tracker AI. Person: '+cfg().weight+'kg body weight.\nRules:\n- Parse into foods and/or activities.\n- Each unique food/activity = ONE entry. Never duplicate.\n- Food names: capitalize. Include quantity in name if >1.\n- For activities: estimate realistic calories. Duration in minutes. NEVER return 0 calories.\n- For foods, include all nutrient estimates based on USDA data.\n- Summary: one plain sentence.\n- Output ONLY raw JSON, no markdown.\n\nLog: "'+text+'"\n\nJSON: {"foods":[{"name":"string","kal":0,"pro":0,"kar":0,"fat":0,"ico":"emoji","satFat":0,"sugar":0,"sodium":0,"chol":0,"vitA":0,"vitD":0,"vitC":0,"ca":0,"fe":0,"potassium":0}],"activities":[{"name":"string","kal":0,"dur":0,"ico":"emoji"}],"summary":"string"}\nUnits: satFat/sugar in g, sodium/chol/ca/fe/potassium in mg, vitA in mcg, vitD in mcg, vitC in mg.',1700);
+    const raw=await callAI('Fitness tracker AI. Person: '+cfg().weight+'kg body weight.\nRules:\n- Parse into foods and/or activities.\n- Each unique food/activity = ONE entry. Never duplicate.\n- Food names: capitalize. Include quantity in name if >1.\n- For activities: estimate realistic calories. Duration in minutes. NEVER return 0 calories.\n- For foods, include all nutrient estimates based on USDA data.\n- Summary: one plain sentence.\n- Output ONLY raw JSON, no markdown.\n\nLog: "'+text+'"\n\nJSON: {"foods":[{"name":"string","kal":0,"pro":0,"kar":0,"fat":0,"ico":"emoji","satFat":0,"sugar":0,"sodium":0,"chol":0,"vitA":0,"vitD":0,"vitC":0,"ca":0,"fe":0,"potassium":0}],"activities":[{"name":"string","kal":0,"dur":0,"ico":"emoji"}],"summary":"string"}\nUnits: satFat/sugar in g, sodium/chol/ca/fe/potassium in mg, vitA in mcg, vitD in mcg, vitC in mg.',900);
     const parsed=JSON.parse(repairJSON(raw));
     const foods=parsed.foods||[],acts=parsed.activities||[];
     const fKal=foods.reduce((a,x)=>a+x.kal,0),aKal=acts.reduce((a,x)=>a+x.kal,0);
