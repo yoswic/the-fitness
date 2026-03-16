@@ -1329,21 +1329,46 @@ function repairJSON(raw) {
   try{JSON.parse(result);return result;}catch(e2){return'{}';}
 }
 
+const FREE_MODELS = [
+  'openrouter/auto',
+  'openrouter/free',
+  'meta-llama/llama-3.3-70b-instruct:free',
+  'meta-llama/llama-3.1-8b-instruct:free',
+  'meta-llama/llama-3.2-3b-instruct:free',
+  'meta-llama/llama-3.2-1b-instruct:free',
+  'mistralai/mistral-7b-instruct:free',
+  'mistralai/mistral-small-3.1-24b-instruct:free',
+  'mistralai/mistral-nemo:free',
+  'qwen/qwen3-8b:free',
+  'qwen/qwen3-14b:free',
+  'qwen/qwen2.5-7b-instruct:free',
+  'deepseek/deepseek-r1-0528-qwen3-8b:free',
+  'deepseek/deepseek-chat-v3-0324:free',
+  'microsoft/phi-4-reasoning-plus:free',
+  'microsoft/phi-3-mini-128k-instruct:free',
+  'nvidia/llama-3.1-nemotron-nano-8b-v1:free',
+  'tngtech/deepseek-r1t-chimera:free'
+];
+
 async function callAI(prompt, max=600) {
   const key=(getApiKey()||'').trim();
   if(!key)throw new Error('OpenRouter API key not set — go to Settings!');
-  if(!key.startsWith('sk-'))throw new Error('Invalid API key format. Should start with sk-or-v1-...');
-  let r;
-  try {
-    r=await fetch('https://openrouter.ai/api/v1/chat/completions',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+key,'X-Title':'The Fitness'},
-      body:JSON.stringify({model:'openrouter/auto',max_tokens:max,messages:[{role:'user',content:prompt}]})
-    });
-  } catch(netErr) { throw new Error('Network error — check your internet connection.'); }
-  const data=await r.json();
-  if(!r.ok||data.error){const msg=data.error?.message||data.error||'API error ('+r.status+')';throw new Error(msg);}
-  return data.choices?.[0]?.message?.content||'';
+  let lastErr='';
+  for(let m=0;m<FREE_MODELS.length;m++){
+    try{
+      const r=await fetch('https://openrouter.ai/api/v1/chat/completions',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':'Bearer '+key,'X-Title':'The Fitness'},
+        body:JSON.stringify({model:FREE_MODELS[m],max_tokens:max,messages:[{role:'user',content:prompt}]})
+      });
+      const data=await r.json();
+      if(data.error){lastErr=data.error?.message||JSON.stringify(data.error);continue;}
+      const text=data.choices?.[0]?.message?.content;
+      if(text&&text.trim())return text;
+      lastErr='Empty response';
+    }catch(e){lastErr=e.message||'Network error';}
+  }
+  throw new Error('Try again in a moment.');
 }
 
 // ── RENDER ──
