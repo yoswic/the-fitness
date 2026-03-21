@@ -1330,13 +1330,22 @@ function repairJSON(raw) {
 }
 
 const FREE_MODELS = [
-  'arcee-ai/trinity-large-preview:free',
-  'arcee-ai/trinity-mini:free',
+  'openrouter/hunter-alpha',
+  'openrouter/healer-alpha',
   'nvidia/nemotron-3-super-120b-a12b:free',
-  'nvidia/nemotron-3-nano-30b-a3b:free',
-  'mistralai/mistral-small-3.1-24b-instruct:free',
-  'z-ai/glm-4.5-air:free',
+  'minimax/minimax-m2.5:free',
+  'stepfun/step-3.5-flash:free',
+  'arcee-ai/trinity-large-preview:free',
+  'liquid/lfm-2.5-1.2b-thinking:free',
   'liquid/lfm-2.5-1.2b-instruct:free',
+  'nvidia/nemotron-3-nano-30b-a3b:free',
+  'arcee-ai/trinity-mini:free',
+  'nvidia/nemotron-nano-12b-v2-vl:free',
+  'nvidia/nemotron-nano-9b-v2:free',
+  'openai/gpt-oss-120b:free',
+  'openai/gpt-oss-20b:free',
+  'z-ai/glm-4.5-air:free',
+  'mistralai/mistral-small-3.1-24b-instruct:free',
 ];
 
 async function tryModel(model, prompt, max, key) {
@@ -1346,12 +1355,7 @@ async function tryModel(model, prompt, max, key) {
     body: JSON.stringify({model, max_tokens: max, messages: [{role:'user', content: prompt}]})
   });
   const data = await r.json();
-  if (data.error) {
-    const msg = data.error?.message || 'Model error';
-    const err = new Error(msg);
-    err.status = r.status;
-    throw err;
-  }
+  if (data.error) throw new Error(data.error?.message || 'Model error');
   const text = data.choices?.[0]?.message?.content;
   if (!text || !text.trim()) throw new Error('Empty response');
   return text;
@@ -1360,15 +1364,11 @@ async function tryModel(model, prompt, max, key) {
 async function callAI(prompt, max=512) {
   const key = (getApiKey()||'').trim();
   if (!key) throw new Error('OpenRouter API key not set — go to Settings!');
-  // Try each model sequentially, skip on rate limit or error
   for (const model of FREE_MODELS) {
     try {
       const result = await tryModel(model, prompt, max, key);
       if (result) return result;
-    } catch(e) {
-      // rate limited or error — just try next model
-      continue;
-    }
+    } catch(e) { continue; }
   }
   throw new Error('AI tidak tersedia saat ini, coba lagi.');
 }
