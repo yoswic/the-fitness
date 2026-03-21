@@ -1086,8 +1086,14 @@ select.fi { background-image:none; }
   <div class="set-card g-heavy">
     <div class="set-row-new">
       <div class="set-row-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div>
-      <div class="set-row-label"><div class="set-lbl">OpenRouter API Key</div><div class="set-sub">Free at openrouter.ai</div></div>
-      <input class="set-inp" type="password" id="sApiKey" placeholder="sk-or-v1-..." oninput="saveSettings()" style="width:120px">
+      <div class="set-row-label"><div class="set-lbl">OpenRouter API Keys</div><div class="set-sub">Up to 5 keys, rotated automatically</div></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:6px;padding:0 0 4px">
+      <input class="set-inp" type="password" id="sApiKey1" placeholder="Key 1 (sk-or-v1-...)" oninput="saveSettings()" style="width:100%">
+      <input class="set-inp" type="password" id="sApiKey2" placeholder="Key 2 (optional)" oninput="saveSettings()" style="width:100%">
+      <input class="set-inp" type="password" id="sApiKey3" placeholder="Key 3 (optional)" oninput="saveSettings()" style="width:100%">
+      <input class="set-inp" type="password" id="sApiKey4" placeholder="Key 4 (optional)" oninput="saveSettings()" style="width:100%">
+      <input class="set-inp" type="password" id="sApiKey5" placeholder="Key 5 (optional)" oninput="saveSettings()" style="width:100%">
     </div>
   </div>
 
@@ -1305,7 +1311,18 @@ const sumAct = () => D.acts.reduce((a,x)=>a+x.kal,0);
 const sumWO = () => D.workouts.reduce((a,w)=>a+(w.kal||0),0);
 const sumBurn = () => sumAct()+sumWO();
 const bmi = (w,h) => h>0 ? (w/((h/100)**2)).toFixed(1) : '—';
-function getApiKey() { return localStorage.getItem('tft_apikey')||cfg().apiKey||''; }
+function getApiKeys() {
+  const keys = [];
+  for (let i = 1; i <= 5; i++) {
+    const k = localStorage.getItem('tft_apikey_'+i)||'';
+    if (k.trim()) keys.push(k.trim());
+  }
+  // fallback to legacy single key
+  const legacy = localStorage.getItem('tft_apikey')||cfg().apiKey||'';
+  if (legacy && !keys.includes(legacy)) keys.push(legacy);
+  return keys;
+}
+function getApiKey() { return getApiKeys()[0]||''; }
 
 // ── AI ──
 function repairJSON(raw) {
@@ -1362,13 +1379,15 @@ async function tryModel(model, prompt, max, key) {
 }
 
 async function callAI(prompt, max=512) {
-  const key = (getApiKey()||'').trim();
-  if (!key) throw new Error('OpenRouter API key not set — go to Settings!');
-  for (const model of FREE_MODELS) {
-    try {
-      const result = await tryModel(model, prompt, max, key);
-      if (result) return result;
-    } catch(e) { continue; }
+  const keys = getApiKeys();
+  if (!keys.length) throw new Error('OpenRouter API key not set — go to Settings!');
+  for (const key of keys) {
+    for (const model of FREE_MODELS) {
+      try {
+        const result = await tryModel(model, prompt, max, key);
+        if (result) return result;
+      } catch(e) { continue; }
+    }
   }
   throw new Error('AI tidak tersedia saat ini, coba lagi.');
 }
@@ -1989,9 +2008,12 @@ function saveSettings(){
   s.height=+document.getElementById('sHeight').value||169;
   s.targetKal=+document.getElementById('sTargetKal').value||2000;
   s.targetWeight=+document.getElementById('sTargetW').value||65;
-  s.apiKey=document.getElementById('sApiKey').value.trim();
+  s.apiKey=document.getElementById('sApiKey1').value.trim();
   s.gender=document.getElementById('sGender').value||'male';
-  localStorage.setItem('tft_apikey',s.apiKey);
+  for (let i = 1; i <= 5; i++) {
+    localStorage.setItem('tft_apikey_'+i, document.getElementById('sApiKey'+i).value.trim());
+  }
+  localStorage.setItem('tft_apikey', s.apiKey);
   document.getElementById('appName').textContent=s.name;
   buildPresetTiles();save();renderAll();
 }
@@ -2470,8 +2492,15 @@ function init() {
   document.getElementById('sTargetKal').value=s.targetKal;
   document.getElementById('sTargetW').value=s.targetWeight;
   document.getElementById('sGender').value=s.gender||'male';
-  const storedKey=localStorage.getItem('tft_apikey')||s.apiKey||'';
-  if(storedKey)document.getElementById('sApiKey').value=storedKey;
+  for (let i = 1; i <= 5; i++) {
+    const k = localStorage.getItem('tft_apikey_'+i)||'';
+    document.getElementById('sApiKey'+i).value = k;
+  }
+  // migrate legacy single key to slot 1 if slots empty
+  if (!document.getElementById('sApiKey1').value) {
+    const legacy = localStorage.getItem('tft_apikey')||s.apiKey||'';
+    if (legacy) { document.getElementById('sApiKey1').value = legacy; localStorage.setItem('tft_apikey_1', legacy); }
+  }
   buildQFCards();buildPresetTiles();
 }
 init();renderAll();
