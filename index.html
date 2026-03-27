@@ -776,6 +776,26 @@ select.fi { background-image:none; }
     <div class="nulabel-row bold"><span>Potassium</span><span id="homeIn14">—</span></div>
     <div class="nulabel-macro-bar"><div id="hmbK" style="width:0%;background:#22c55e"></div></div>
     <div class="nulabel-row indent"><span><span id="hmK">0mg</span> of 4700mg</span><span id="hmKPct">0%</span></div>
+    <div class="nulabel-divider thin"></div>
+    <!-- Vitamin B complex -->
+    <div class="nulabel-row bold" style="margin-top:2px"><span>Vitamin B1 (Thiamine)</span><span id="homeIn15">—</span></div>
+    <div class="nulabel-macro-bar"><div id="hmbB1" style="width:0%;background:#22c55e"></div></div>
+    <div class="nulabel-row indent"><span><span id="hmB1">0mg</span> of 1.2mg</span><span id="hmB1Pct">0%</span></div>
+    <div class="nulabel-row bold"><span>Vitamin B2 (Riboflavin)</span><span id="homeIn16">—</span></div>
+    <div class="nulabel-macro-bar"><div id="hmbB2" style="width:0%;background:#22c55e"></div></div>
+    <div class="nulabel-row indent"><span><span id="hmB2">0mg</span> of 1.3mg</span><span id="hmB2Pct">0%</span></div>
+    <div class="nulabel-row bold"><span>Vitamin B3 (Niacin)</span><span id="homeIn17">—</span></div>
+    <div class="nulabel-macro-bar"><div id="hmbB3" style="width:0%;background:#22c55e"></div></div>
+    <div class="nulabel-row indent"><span><span id="hmB3">0mg</span> of 16mg</span><span id="hmB3Pct">0%</span></div>
+    <div class="nulabel-row bold"><span>Vitamin B5 (Pantothenic Acid)</span><span id="homeIn19">—</span></div>
+    <div class="nulabel-macro-bar"><div id="hmbB9" style="width:0%;background:#22c55e"></div></div>
+    <div class="nulabel-row indent"><span><span id="hmB9">0mg</span> of 5mg</span><span id="hmB9Pct">0%</span></div>
+    <div class="nulabel-row bold"><span>Vitamin B6 (Pyridoxine)</span><span id="homeIn18">—</span></div>
+    <div class="nulabel-macro-bar"><div id="hmbB6" style="width:0%;background:#22c55e"></div></div>
+    <div class="nulabel-row indent"><span><span id="hmB6">0mg</span> of 1.3mg</span><span id="hmB6Pct">0%</span></div>
+    <div class="nulabel-row bold"><span>Vitamin B12 (Cobalamin)</span><span id="homeIn20">—</span></div>
+    <div class="nulabel-macro-bar"><div id="hmbB12" style="width:0%;background:#22c55e"></div></div>
+    <div class="nulabel-row indent"><span><span id="hmB12">0mcg</span> of 2.4mcg</span><span id="hmB12Pct">0%</span></div>
     <div class="nulabel-divider thick"></div>
     <!-- Bottom stats -->
     <div class="nulabel-stats">
@@ -834,7 +854,7 @@ select.fi { background-image:none; }
       <div style="display:flex;gap:8px">
         <div style="flex:1;background:rgba(217,119,6,0.07);border-radius:14px;padding:10px 12px;">
           <div style="font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--t3);margin-bottom:4px">Protein</div>
-          <div style="font-size:15px;font-weight:900;color:var(--t1);line-height:1" id="fPro">0g</div>
+          <div style="font-size:15px;font-weight:900;color:var(--t1);line-height:1" id="fProDisp">0g</div>
           <div style="height:2px;background:rgba(0,0,0,0.08);border-radius:99px;overflow:hidden;margin-top:6px"><div id="fProBar" style="height:100%;width:0%;background:var(--accent);border-radius:99px;transition:width .7s ease;"></div></div>
         </div>
         <div style="flex:1;background:rgba(217,119,6,0.07);border-radius:14px;padding:10px 12px;">
@@ -1179,7 +1199,7 @@ select.fi { background-image:none; }
       <div class="fg"><div class="fl">Food Name</div><input class="fi" type="text" id="fName" placeholder="Chicken rice, salad..."></div>
       <div class="fg2" style="margin-bottom:10px">
         <div class="fg"><div class="fl">Calories *</div><input class="fi" type="number" id="fKalInput" placeholder="0"></div>
-        <div class="fg"><div class="fl">Protein (g)</div><input class="fi" type="number" id="fPro" placeholder="0"></div>
+        <div class="fg"><div class="fl">Protein (g)</div><input class="fi" type="number" id="fProInput" placeholder="0"></div>
         <div class="fg"><div class="fl">Carbs (g)</div><input class="fi" type="number" id="fKar" placeholder="0"></div>
         <div class="fg"><div class="fl">Fat (g)</div><input class="fi" type="number" id="fFat" placeholder="0"></div>
       </div>
@@ -1205,6 +1225,19 @@ select.fi { background-image:none; }
       <div class="fg2">
         <div class="fg"><div class="fl">Zat Besi / Fe</div><input class="fi" type="number" id="fFe" placeholder="0" min="0" max="999"></div>
         <div class="fg"><div class="fl">Kalium</div><input class="fi" type="number" id="fPotassium" placeholder="0" min="0" max="999"></div>
+      </div>
+      <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--t3);margin:14px 0 10px">
+        Vitamin B (% AKG)
+      </div>
+      <div class="fg2" style="margin-bottom:10px">
+        <div class="fg"><div class="fl">B1 Thiamine (%)</div><input class="fi" type="number" id="fVitB1" placeholder="0" min="0" max="999"></div>
+        <div class="fg"><div class="fl">B2 Riboflavin (%)</div><input class="fi" type="number" id="fVitB2" placeholder="0" min="0" max="999"></div>
+        <div class="fg"><div class="fl">B3 Niacin (%)</div><input class="fi" type="number" id="fVitB3" placeholder="0" min="0" max="999"></div>
+        <div class="fg"><div class="fl">B5 Pantothenic (%)</div><input class="fi" type="number" id="fVitB9" placeholder="0" min="0" max="999"></div>
+      </div>
+      <div class="fg2">
+        <div class="fg"><div class="fl">B6 Pyridoxine (%)</div><input class="fi" type="number" id="fVitB6" placeholder="0" min="0" max="999"></div>
+        <div class="fg"><div class="fl">B12 Cobalamin (%)</div><input class="fi" type="number" id="fVitB12" placeholder="0" min="0" max="999"></div>
       </div>
     </div>
     <button class="btn primary" style="flex-shrink:0;margin-top:14px" onclick="addFood()">Add to Log</button>
@@ -1395,7 +1428,8 @@ function rHome() {
   document.getElementById('homeWater').textContent=`${D.water} / 8 glasses`;
   // macros helper
   const sp=(valId,barId,pctId,v,t,unit)=>{
-    document.getElementById(valId).textContent=Math.round(v)+unit;
+    const disp=v<10&&v!==Math.round(v)?+(v.toFixed(1)):Math.round(v);
+    document.getElementById(valId).textContent=disp+unit;
     document.getElementById(barId).style.width=Math.min(v/t*100,100)+'%';
     if(pctId) document.getElementById(pctId).textContent=Math.round(v/t*100)+'%';
   };
@@ -1418,8 +1452,17 @@ function rHome() {
   sp('hmCa','hmbCa','hmCaPct',ca,1000,'mg');
   sp('hmFe','hmbFe','hmFePct',fe,feTarget,'mg');
   sp('hmK','hmbK','hmKPct',potassium,4700,'mg');
+  // vitamin B
+  const vitB1=sumFood('vitB1'),vitB2=sumFood('vitB2'),vitB3=sumFood('vitB3');
+  const vitB6=sumFood('vitB6'),vitB9=sumFood('vitB9'),vitB12=sumFood('vitB12');
+  sp('hmB1','hmbB1','hmB1Pct',vitB1,AKG_BPOM.vitB1,'mg');
+  sp('hmB2','hmbB2','hmB2Pct',vitB2,AKG_BPOM.vitB2,'mg');
+  sp('hmB3','hmbB3','hmB3Pct',vitB3,AKG_BPOM.vitB3,'mg');
+  sp('hmB6','hmbB6','hmB6Pct',vitB6,AKG_BPOM.vitB6,'mg');
+  sp('hmB9','hmbB9','hmB9Pct',vitB9,AKG_BPOM.vitB9,'mg');
+  sp('hmB12','hmbB12','hmB12Pct',vitB12,AKG_BPOM.vitB12,'mcg');
   // label dashes
-  ['homeIn2','homeIn3','homeIn4','homeIn5','homeIn6','homeIn7','homeIn8','homeIn9','homeIn10','homeIn11','homeIn12','homeIn13','homeIn14'].forEach(id=>document.getElementById(id).textContent='—');
+  ['homeIn2','homeIn3','homeIn4','homeIn5','homeIn6','homeIn7','homeIn8','homeIn9','homeIn10','homeIn11','homeIn12','homeIn13','homeIn14','homeIn15','homeIn16','homeIn17','homeIn18','homeIn19','homeIn20'].forEach(id=>document.getElementById(id).textContent='—');
   document.getElementById('hWO').textContent=D.workouts.length;
   document.getElementById('hBurn').textContent=fo;
   const lat=D.bodyLogs.length?D.bodyLogs[D.bodyLogs.length-1]:null;
@@ -1446,7 +1489,7 @@ function rFood() {
   document.getElementById('fTarget').textContent=tk.toLocaleString('en');
   document.getElementById('fSisa').textContent=Math.max(tk-kal,0).toLocaleString('en');
   document.getElementById('fKalBar').style.width=(pct*100)+'%';
-  document.getElementById('fPro').textContent=Math.round(pro)+'g';
+  document.getElementById('fProDisp').textContent=Math.round(pro)+'g';
   document.getElementById('fProBar').style.width=Math.min(pro/130*100,100)+'%';
   document.getElementById('fKarVal').textContent=Math.round(kar)+'g';
   document.getElementById('fKarBar').style.width=Math.min(kar/220*100,100)+'%';
@@ -1716,7 +1759,8 @@ document.addEventListener('input',e=>{if(e.target.id==='compKalPer100'||e.target
 
 // ── FOOD ──
 // Nilai AKG BPOM (absolut)
-const AKG_BPOM = { vitA:900, vitD:15, vitC:90, ca:1000, fe:13, feFemale:26, potassium:4700 };
+const AKG_BPOM = { vitA:900, vitD:15, vitC:90, ca:1000, fe:13, feFemale:26, potassium:4700,
+  vitB1:1.2, vitB2:1.3, vitB3:16, vitB6:1.3, vitB9:5, vitB12:2.4 };
 function pctToAbs(pct, ref) { return Math.round((+pct||0) / 100 * ref * 10) / 10; }
 
 function addFood(){
@@ -1725,7 +1769,7 @@ function addFood(){
   const gender=cfg().gender||'male';
   const feRef=gender==='female'?AKG_BPOM.feFemale:AKG_BPOM.fe;
   push_food(name,kal,
-    +document.getElementById('fPro').value||0,
+    +document.getElementById('fProInput').value||0,
     +document.getElementById('fKar').value||0,
     +document.getElementById('fFat').value||0,
     '',{
@@ -1738,17 +1782,24 @@ function addFood(){
       vitC:pctToAbs(document.getElementById('fVitC').value, AKG_BPOM.vitC),
       ca:pctToAbs(document.getElementById('fCa').value, AKG_BPOM.ca),
       fe:pctToAbs(document.getElementById('fFe').value, feRef),
-      potassium:pctToAbs(document.getElementById('fPotassium').value, AKG_BPOM.potassium)
+      potassium:pctToAbs(document.getElementById('fPotassium').value, AKG_BPOM.potassium),
+      vitB1:pctToAbs(document.getElementById('fVitB1').value, AKG_BPOM.vitB1),
+      vitB2:pctToAbs(document.getElementById('fVitB2').value, AKG_BPOM.vitB2),
+      vitB3:pctToAbs(document.getElementById('fVitB3').value, AKG_BPOM.vitB3),
+      vitB6:pctToAbs(document.getElementById('fVitB6').value, AKG_BPOM.vitB6),
+      vitB9:pctToAbs(document.getElementById('fVitB9').value, AKG_BPOM.vitB9),
+      vitB12:pctToAbs(document.getElementById('fVitB12').value, AKG_BPOM.vitB12)
     }
   );
-  ['fName','fKalInput','fPro','fKar','fFat','fSatFat','fSugar','fSodium','fChol','fVitA','fVitD','fVitC','fCa','fFe','fPotassium'].forEach(id=>document.getElementById(id).value='');
+  ['fName','fKalInput','fProInput','fKar','fFat','fSatFat','fSugar','fSodium','fChol','fVitA','fVitD','fVitC','fCa','fFe','fPotassium','fVitB1','fVitB2','fVitB3','fVitB6','fVitB9','fVitB12'].forEach(id=>document.getElementById(id).value='');
   closeSheet();renderAll();
 }
 function push_food(name,kal,pro,kar,fat,ico,extras){
   extras=extras||{};
   D.foods.push({id:Date.now(),name,kal,pro,kar,fat,ico,time:tnow(),
     satFat:extras.satFat||0,sugar:extras.sugar||0,sodium:extras.sodium||0,chol:extras.chol||0,
-    vitA:extras.vitA||0,vitD:extras.vitD||0,vitC:extras.vitC||0,ca:extras.ca||0,fe:extras.fe||0,potassium:extras.potassium||0
+    vitA:extras.vitA||0,vitD:extras.vitD||0,vitC:extras.vitC||0,ca:extras.ca||0,fe:extras.fe||0,potassium:extras.potassium||0,
+    vitB1:extras.vitB1||0,vitB2:extras.vitB2||0,vitB3:extras.vitB3||0,vitB6:extras.vitB6||0,vitB9:extras.vitB9||0,vitB12:extras.vitB12||0
   });save();
 }
 function delFood(id){D.foods=D.foods.filter(f=>f.id!==id);save();renderAll();}
@@ -1787,14 +1838,14 @@ async function doAIFood(){
   btn.disabled=true;btn.textContent='Analyzing...';
   res.innerHTML=`<div class="ai-box"><div class="ai-loading"><div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div> Analyzing food...</div></div>`;
   try{
-    const raw=await callAI(`You are a nutritionist AI. Parse the meal and return ONLY raw JSON, no markdown.\nMeal: "${text}"\nRules: If quantity mentioned multiply values. Each distinct food = one item. Realistic values based on USDA/standard nutrition databases.\nJSON: {"items":[{"name":"Food name","kal":150,"pro":10,"kar":20,"fat":5,"ico":"emoji","satFat":2,"sugar":5,"sodium":80,"chol":30,"vitA":50,"vitD":1,"vitC":5,"ca":40,"fe":1.2,"potassium":200}],"note":"one tip"}\nUnits: kal/pro/kar/fat/satFat/sugar in g, sodium/chol/ca/fe/potassium in mg, vitA in mcg, vitD in mcg, vitC in mg. Estimate as accurately as possible.`,512);
+    const raw=await callAI(`You are a nutritionist AI. Parse the meal and return ONLY raw JSON, no markdown.\nMeal: "${text}"\nRules: If quantity mentioned multiply values. Each distinct food = one item. Realistic values based on USDA/standard nutrition databases.\nJSON: {"items":[{"name":"Food name","kal":150,"pro":10,"kar":20,"fat":5,"ico":"emoji","satFat":2,"sugar":5,"sodium":80,"chol":30,"vitA":50,"vitD":1,"vitC":5,"ca":40,"fe":1.2,"potassium":200,"vitB1":0.1,"vitB2":0.1,"vitB3":1,"vitB9":0.3,"vitB6":0.1,"vitB12":0.5}],"note":"one tip"}\nUnits: kal/pro/kar/fat/satFat/sugar in g, sodium/chol/ca/fe/potassium in mg, vitA in mcg, vitD in mcg, vitC in mg, vitB1/B2/B3/B5(vitB9)/B6 in mg, vitB12 in mcg. Estimate as accurately as possible.`,512);
     const parsed=JSON.parse(repairJSON(raw));
     let items=parsed.items||parsed.foods||[];
     res.innerHTML=`<div class="ai-box">${items.map(x=>`<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid rgba(0,0,0,0.05)"><span style="flex:1;font-size:12px;color:var(--t1)">${x.name}</span><span style="font-weight:600;color:var(--accent)">${x.kal} cal</span></div>`).join('')}${parsed.note?`<p style="font-size:11px;color:var(--t2);margin-top:8px">${parsed.note}</p>`:''}</div><button class="btn" style="margin-top:10px" onclick='confirmAIFood(${JSON.stringify(items)})'>+ Add ${items.length} item${items.length!==1?'s':''} to Log</button>`;
   }catch(e){res.innerHTML=`<div class="ai-box"><p style="color:var(--red)">${e.message||'Failed.'}</p></div>`;}
   btn.disabled=false;btn.textContent='Analyze & Add to Log';
 }
-function confirmAIFood(items){items.forEach(x=>push_food(x.name,x.kal,x.pro||0,x.kar||0,x.fat||0,x.ico||'',{satFat:x.satFat||0,sugar:x.sugar||0,sodium:x.sodium||0,chol:x.chol||0,vitA:x.vitA||0,vitD:x.vitD||0,vitC:x.vitC||0,ca:x.ca||0,fe:x.fe||0,potassium:x.potassium||0}));document.getElementById('aiFood').value='';document.getElementById('aiFoodResult').innerHTML='';closeSheet();renderAll();}
+function confirmAIFood(items){items.forEach(x=>push_food(x.name,x.kal,x.pro||0,x.kar||0,x.fat||0,x.ico||'',{satFat:x.satFat||0,sugar:x.sugar||0,sodium:x.sodium||0,chol:x.chol||0,vitA:x.vitA||0,vitD:x.vitD||0,vitC:x.vitC||0,ca:x.ca||0,fe:x.fe||0,potassium:x.potassium||0,vitB1:x.vitB1||0,vitB2:x.vitB2||0,vitB3:x.vitB3||0,vitB6:x.vitB6||0,vitB9:x.vitB9||0,vitB12:x.vitB12||0}));document.getElementById('aiFood').value='';document.getElementById('aiFoodResult').innerHTML='';closeSheet();renderAll();}
 
 // ── ACTIVITY ──
 function buildPresets(){const w=cfg().weight;return[{n:'Run 30 min',i:'RUN',k:Math.round(8*w*.5),d:30},{n:'Run 20 min',i:'RUN',k:Math.round(8*w*.33),d:20},{n:'Brisk walk 30 min',i:'WALK',k:Math.round(4.5*w*.5),d:30},{n:'Cycling 30 min',i:'CYCLE',k:Math.round(7*w*.5),d:30},{n:'HIIT 20 min',i:'HIIT',k:Math.round(10*w*.33),d:20},{n:'Stretching 20 min',i:'FLEX',k:Math.round(3*w*.33),d:20},{n:'Stairs 10 min',i:'STAIR',k:Math.round(8*w*.17),d:10},{n:'Standing 1 hr',i:'STAND',k:Math.round(2*w),d:60}];}
